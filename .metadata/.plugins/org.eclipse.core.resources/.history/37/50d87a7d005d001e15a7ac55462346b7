@@ -1,0 +1,8 @@
+package com.cts.customer.model;
+
+public class CustomerDetailsRequest {
+	
+	private Long accountNo;
+	private String accountType;
+
+}

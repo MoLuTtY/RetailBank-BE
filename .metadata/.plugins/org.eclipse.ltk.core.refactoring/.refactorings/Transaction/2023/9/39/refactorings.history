@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy element &apos;CreateTransactionRequest.java&apos; to &apos;Account/src/main/java/com.cts.account.model&apos;&#x0D;&#x0A;- Original project: &apos;Transaction&apos;&#x0D;&#x0A;- Destination element: &apos;Account/src/main/java/com.cts.account.model&apos;&#x0D;&#x0A;- Original element: &apos;com.cts.transaction.model.CreateTransactionRequest.java&apos;" description="Copy compilation unit" destination="=Account/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.cts.account.model" element1="/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.cts.transaction.model{CreateTransactionRequest.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyResources" stamp="1695981288778" units="1" version="1.0"/>
+</session>

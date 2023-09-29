@@ -1,0 +1,21 @@
+package com.cts.account.model;
+
+import java.time.LocalDate;
+
+import jakarta.validation.constraints.NotNull;
+
+public class Customers {
+	
+	private Long customerId;
+   
+    private String customerName;
+    
+    private String password;
+   
+    private LocalDate dateOfBirth;
+   
+    private String pan;
+   
+    private String address;
+
+}

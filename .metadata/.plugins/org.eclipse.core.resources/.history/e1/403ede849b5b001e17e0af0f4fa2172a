@@ -1,0 +1,5 @@
+package com.cts.account.controller;
+
+public class AccountController {
+
+}

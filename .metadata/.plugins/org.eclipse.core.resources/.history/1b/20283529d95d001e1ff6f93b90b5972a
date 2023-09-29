@@ -1,0 +1,23 @@
+package com.cts.account.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.cts.account.model.Account;
+import com.cts.account.model.AccountType;
+
+public interface AccountRepository extends JpaRepository<Account, Long>{
+
+	Account findTopByOrderByAccountIdDesc();
+	
+    @Query("SELECT a FROM Account a WHERE a.customerId = :customerId AND a.accountId.accountType = 'SAVINGS'")
+    Account findSavingsAccountByCustomerId(@Param("customerId") Long customerId);
+
+    @Query("SELECT a FROM Account a WHERE a.accountId.accountNo = :accountNo AND a.accountId.accountType = :accountType")
+	Account viewCustomerByAccountNoAndAccountType(@Param("accountNo") Long accountNo, @Param("accountType") AccountType accountType);
+
+    @Query(value = "DELETE FROM Account a WHERE a.accountId.accountNo = :accountNo", nativeQuery = true)
+	Account findByAccountIdAccountNo(Long accountNo);
+
+}

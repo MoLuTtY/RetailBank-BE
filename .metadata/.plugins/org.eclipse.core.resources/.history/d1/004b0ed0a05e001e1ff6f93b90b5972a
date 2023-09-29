@@ -1,0 +1,7 @@
+package com.cts.transaction.model;
+
+public class TransactionStatus {
+	
+	private String status;
+
+}

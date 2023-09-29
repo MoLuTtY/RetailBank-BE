@@ -1,0 +1,36 @@
+package com.cts.account.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cts.account.model.Account;
+import com.cts.account.model.CreateAccountRequest;
+import com.cts.account.model.CreateAccountResponse;
+import com.cts.account.repository.AccountRepository;
+
+
+@Service
+public class AccountServiceImpl implements AccountService{
+	
+	@Autowired
+	private AccountRepository accountRepository;
+
+	@Override
+	public CreateAccountResponse createAccount(CreateAccountRequest createAccountRequest) {
+		Account account = new Account();
+        account.setCustomerId(createAccountRequest.getCustomerId());
+        account.setAccountType(createAccountRequest.getAccountType());
+        account.setOpeningAmount(createAccountRequest.getOpeningAmount());
+        account.setCurrentBalance(createAccountRequest.getCurrentBalance());
+        account.setInitiationDate(createAccountRequest.getInitiationDate());
+        
+        Account savedAccount = accountRepository.save(account);
+
+        CreateAccountResponse response = new CreateAccountResponse(savedAccount.getAccountNo(), "Account created successfully");
+
+        return response;
+	}
+
+	
+
+}

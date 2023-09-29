@@ -1,0 +1,10 @@
+package com.cts.transaction.model;
+
+import lombok.Setter;
+
+@Setter
+public class TransactionStatus {
+	
+	private String status;
+
+}

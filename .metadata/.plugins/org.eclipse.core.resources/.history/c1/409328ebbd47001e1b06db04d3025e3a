@@ -1,0 +1,44 @@
+package com.cts.customer.service;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cts.customer.model.Customer;
+import com.cts.customer.model.CustomerCreationStatus;
+import com.cts.customer.repository.CustomerRepository;
+
+@Service
+public class CustomerServiceImpl implements CustomerService{
+	
+	@Autowired
+	private CustomerRepository customerRepository;
+	
+	@Override
+	public CustomerCreationStatus createCustomer(Customer customer) {
+		
+	    String pan = customer.getPan();
+	    int yearOfBirth = customer.getDateOfBirth().getYear();
+	    String first5Pan = pan.substring(0, 5);
+	    String last5Pan = pan.substring(5, 10);
+	    String customerId = first5Pan + yearOfBirth + last5Pan;
+	    
+	    Optional<Customer> existingCustomer = customerRepository.findById(customerId);
+	    if (existingCustomer.isPresent()) {
+	        CustomerCreationStatus creationStatus = new CustomerCreationStatus();
+	        creationStatus.setMessage("Customer with this id already exists");
+	        creationStatus.setUserid(customerId);
+	        return creationStatus;
+	    }
+
+	    customer.setCustomerId(customerId);
+
+	    Customer createdCustomer = customerRepository.save(customer);
+	    CustomerCreationStatus creationStatus = new CustomerCreationStatus();
+	    creationStatus.setMessage("Customer profile created successfully");
+	    creationStatus.setUserid(createdCustomer.getCustomerId());
+	    return creationStatus;
+	}
+	
+}

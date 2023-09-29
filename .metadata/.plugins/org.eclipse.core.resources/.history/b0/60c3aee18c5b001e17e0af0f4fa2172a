@@ -1,0 +1,32 @@
+package com.cts.customer.service;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cts.customer.model.CreateCustomerResponse;
+import com.cts.customer.model.Customers;
+import com.cts.customer.repository.CustomerRepository;
+
+@Service
+public class CustomerServiceImpl implements CustomerService{
+	
+	@Autowired
+	private CustomerRepository customerRepository;
+
+	public CreateCustomerResponse createCustomer(Customers customer) {
+        try {
+        	Customers createdCustomer = customerRepository.save(customer);
+        	Long customerId = createdCustomer.getCustomerId(); 
+
+            String message = "Customer created successfully";
+            return new CreateCustomerResponse(customerId, message);
+        } catch (Exception e) {
+           
+            return new CreateCustomerResponse(null, "Error creating customer");
+        }
+    }
+	
+	
+	
+}

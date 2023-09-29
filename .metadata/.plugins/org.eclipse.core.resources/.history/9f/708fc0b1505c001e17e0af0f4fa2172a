@@ -1,0 +1,8 @@
+package com.cts.customer.feignClient;
+
+import org.springframework.cloud.openfeign.FeignClient;
+
+@FeignClient(name = "accounts-service")
+public interface AccountFeignClient {
+
+}

@@ -1,0 +1,20 @@
+package com.cts.account.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cts.account.model.Account;
+import com.cts.account.model.CreateAccountRequest;
+import com.cts.account.model.CreateAccountResponse;
+import com.cts.account.repository.AccountRepository;
+
+
+@Service
+public class AccountServiceImpl implements AccountService{
+	
+	@Autowired
+	private AccountRepository accountRepository;
+
+	
+
+}

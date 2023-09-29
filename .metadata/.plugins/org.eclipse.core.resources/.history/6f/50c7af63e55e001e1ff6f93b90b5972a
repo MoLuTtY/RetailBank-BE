@@ -1,0 +1,14 @@
+package com.cts.transaction.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.cts.transaction.model.Transaction;
+
+public interface TransactionRepository extends JpaRepository<Transaction, Long>{
+
+	@Query("DELETE FROM TRANSACTIONS s WHERE s.source_account_no = :source_account_no")
+	void deleteTransactions(@Param("source_account_no") Long accountNo);
+
+}

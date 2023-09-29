@@ -1,0 +1,15 @@
+package com.cts.customer.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+public class CustomerDetailsRequest {
+	
+	private Long accountNo;
+	private String accountType;
+
+}

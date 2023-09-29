@@ -1,0 +1,16 @@
+package com.cts.account.feignClient;
+
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+
+@FeignClient(name = "transaction-service", url = "http://localhost:8070")
+public interface TransactionFeignClient {
+	
+	@PostMapping("/deposit")
+	TransactionStatus deposit(@RequestBody CreateTransactionRequest transaction)
+
+}

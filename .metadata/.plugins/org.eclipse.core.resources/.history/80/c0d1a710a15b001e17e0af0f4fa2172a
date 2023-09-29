@@ -1,0 +1,11 @@
+package com.cts.customer.service;
+
+import com.cts.customer.model.CreateCustomerResponse;
+import com.cts.customer.model.Customers;
+
+
+public interface CustomerService {
+
+	CreateCustomerResponse createCustomer(Customers customer);
+
+}
