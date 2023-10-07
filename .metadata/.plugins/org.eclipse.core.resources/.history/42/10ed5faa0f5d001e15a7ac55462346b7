@@ -1,5 +1,0 @@
-package com.cts.account.exception;
-
-public class AccountNotFoundException extends Exception {
-
-}

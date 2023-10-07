@@ -1,5 +1,0 @@
-package com.cts.account.feignClient;
-
-public interface TransactionFeignClient {
-
-}

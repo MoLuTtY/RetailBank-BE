@@ -1,5 +1,0 @@
-package com.cts.transaction.repository;
-
-public interface TransactionRepository {
-
-}

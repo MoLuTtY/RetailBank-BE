@@ -38,6 +38,9 @@ public class Transaction {
 
     @NotNull(message="Account id cannot be null")
     private Long accountId;
+    
+    @NotNull(message="Customer id cannot be null")
+    private Long customerId;
 
     private Long sourceAccountNo;
 

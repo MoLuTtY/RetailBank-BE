@@ -1,8 +1,0 @@
-package com.cts.transaction.model;
-
-@Setter
-public class TransactionStatus {
-	
-	private String status;
-
-}

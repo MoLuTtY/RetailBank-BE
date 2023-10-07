@@ -9,6 +9,7 @@ import com.cts.customer.exception.AccountNotFoundException;
 import com.cts.customer.model.CreateCustomerResponse;
 import com.cts.customer.model.Customer;
 import com.cts.customer.model.CustomerDetailsResponse;
+import com.cts.customer.model.CustomerProfileResponse;
 
 
 public interface CustomerService {
@@ -17,6 +18,7 @@ public interface CustomerService {
 	List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount();
 	CustomerDetailsResponse searchCustomer(Long accountNo, AccountType accountType) throws AccountNotFoundException;
 	String deleteCustomer(Long customerId);
+	List<CustomerProfileResponse> viewCustomer(Long customerId);
 	
 
 }

@@ -1,8 +1,0 @@
-package com.cts.transaction.service;
-
-import org.springframework.stereotype.Service;
-
-@Service
-public interface TransactionServiceImpl extends TransactionService{
-
-}

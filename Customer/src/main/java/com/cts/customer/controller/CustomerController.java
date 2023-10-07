@@ -18,6 +18,7 @@ import com.cts.account.model.AccountType;
 import com.cts.customer.model.CreateCustomerResponse;
 import com.cts.customer.model.Customer;
 import com.cts.customer.model.CustomerDetailsResponse;
+import com.cts.customer.model.CustomerProfileResponse;
 import com.cts.customer.service.CustomerService;
 
 @RestController
@@ -56,5 +57,11 @@ public class CustomerController {
 	public String deleteCustomer(@PathVariable Long customerId) {
 		return customerService.deleteCustomer(customerId);
 	}
+    
+    @GetMapping("/view-customer/{customerId}")
+    public ResponseEntity<List<CustomerProfileResponse>> viewCustomer(@PathVariable Long customerId) {
+    	List<CustomerProfileResponse> response = customerService.viewCustomer(customerId);
+    	return ResponseEntity.ok(response);
+    }
         
 }

@@ -29,4 +29,8 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 
     @Query("SELECT a FROM Account a WHERE a.accountId.accountNo = :accountNo AND a.accountId.accountType = :accountType")
 	Account getAccountByNoAndType(@Param("accountNo") Long accountNo,@Param("accountType") AccountType accountType);
+
+    @Query("SELECT a FROM Account a WHERE a.customerId = :customerId AND a.accountId.accountType = 'CURRENT'")
+	Account findCurrentAccountByCustomerId(@Param("customerId")Long customerId);
+
 }

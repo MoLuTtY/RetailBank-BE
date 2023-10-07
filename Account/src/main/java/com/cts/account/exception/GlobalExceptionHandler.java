@@ -14,4 +14,10 @@ public class GlobalExceptionHandler {
 		return res;
 	}
 	
+	@ExceptionHandler(MinimumBalanceException.class)
+	public ResponseEntity<String> noMinBalance(MinimumBalanceException ex) {
+		ResponseEntity<String> res = new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+		return res;
+	}
+	
 }

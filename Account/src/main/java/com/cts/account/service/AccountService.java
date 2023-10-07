@@ -16,5 +16,10 @@ public interface AccountService {
 	void deleteAllAccountsByAccountNo(Long accountNo);
 	public Long getgetCustomerIdByAccountNo(Long accountNo);
 	public void deposit(Long accountNo, AccountType accounttype, BigDecimal amount);
-
+	public BigDecimal getCurrentBalance(Long accountNo, AccountType accountType);
+	public void updateCurrentBalance(Long accountNo, AccountType accountType, BigDecimal newBalance);
+	public Account findCurrentAccounts(Long customerId);
+	public void withdraw(Long accountNo, AccountType accountType, BigDecimal amount);
+	public Long getAccount(Long accountNo, AccountType accountType);
+	
 }

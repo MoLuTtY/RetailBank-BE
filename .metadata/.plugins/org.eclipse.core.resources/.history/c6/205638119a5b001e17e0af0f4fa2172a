@@ -1,5 +1,0 @@
-package com.cts.account.model;
-
-public record AccountType() {
-
-}

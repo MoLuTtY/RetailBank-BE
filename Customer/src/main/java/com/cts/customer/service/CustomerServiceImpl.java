@@ -13,10 +13,13 @@ import com.cts.account.model.AccountType;
 import com.cts.customer.exception.AccountNotFoundException;
 import com.cts.customer.exception.CustomerNotFoundException;
 import com.cts.customer.feignClient.AccountFeignClient;
+import com.cts.customer.feignClient.AuthFeignClient;
 import com.cts.customer.feignClient.TransactionFeignClient;
 import com.cts.customer.model.CreateCustomerResponse;
 import com.cts.customer.model.Customer;
 import com.cts.customer.model.CustomerDetailsResponse;
+import com.cts.customer.model.CustomerProfileResponse;
+import com.cts.customer.model.SignupRequest;
 import com.cts.customer.repository.CustomerRepository;
 
 import feign.FeignException;
@@ -28,12 +31,14 @@ public class CustomerServiceImpl implements CustomerService{
 	private CustomerRepository customerRepository;
 	
 	private final AccountFeignClient accountFeignClient;
-	private final TransactionFeignClient transactionFeignClient;
+	private final TransactionFeignClient transactionFeignClient; 
+	private final AuthFeignClient authFeignClient;
 	
     @Autowired
-    public CustomerServiceImpl(AccountFeignClient accountFeignClient, TransactionFeignClient transactionFeignClient) {
+    public CustomerServiceImpl(AccountFeignClient accountFeignClient, TransactionFeignClient transactionFeignClient, AuthFeignClient authFeignClient) {
         this.accountFeignClient = accountFeignClient;
 		this.transactionFeignClient = transactionFeignClient;
+		this.authFeignClient = authFeignClient;
     }
 	
 	public Long generateCustomerId(Customer customer) {
@@ -62,11 +67,19 @@ public class CustomerServiceImpl implements CustomerService{
         	Customer createdCustomer = customerRepository.save(customer);
         	Long customerId = createdCustomer.getCustomerId(); 
             String message = "Customer created successfully";
+            
+            SignupRequest request = new SignupRequest();
+            request.setPassword(customer.getPassword());
+            request.setUsername(Long.toString(customer.getCustomerId()));
+            authFeignClient.signup(request);
+            
             return new CreateCustomerResponse(customerId, message);
         } catch (Exception e) {
            
             return new CreateCustomerResponse(null, "Error creating customer");
         }
+       
+        
     }
 
 	public List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount() {
@@ -133,13 +146,45 @@ public class CustomerServiceImpl implements CustomerService{
 		else {
 		
 			Account account = accountFeignClient.getCustomerSavingsAccount(customerId);
-			System.out.println("account : "+account);
-			System.out.println(account.getAccountId().getAccountNo());
 			transactionFeignClient.deleteTransactions(account.getAccountId().getAccountNo());
 			accountFeignClient.deleteAllAccountsByAccountNo(account.getAccountId().getAccountNo());
 		
 			customerRepository.deleteById(customerId);
 			return "Customer with id "+customerId+" deleted successfully";
 		}
+	}
+
+	@Override
+	public List<CustomerProfileResponse> viewCustomer(Long customerId) {
+		Customer customer = customerRepository.getById(customerId);
+		List<CustomerProfileResponse> result = new ArrayList<>();
+		
+		Account savingsAccount = accountFeignClient.getCustomerSavingsAccount(customerId);
+		Account currentAccount = accountFeignClient.findCurrentAccounts(customerId);
+		
+	    CustomerProfileResponse savingsResponse = new CustomerProfileResponse();
+	    savingsResponse.setName(customer.getCustomerName());	
+	    savingsResponse.setDob(customer.getDateOfBirth());
+	    savingsResponse.setPan(customer.getPan());
+	    savingsResponse.setAddress(customer.getAddress());
+	    savingsResponse.setAccountNo(savingsAccount.getAccountId().getAccountNo());
+	    savingsResponse.setAccountType(savingsAccount.getAccountId().getAccountType());
+	    savingsResponse.setCurrentBalance(savingsAccount.getCurrentBalance());
+	    
+	    result.add(savingsResponse);
+	    
+	    CustomerProfileResponse currentResponse = new CustomerProfileResponse();
+	    currentResponse.setName(customer.getCustomerName());	
+	    currentResponse.setDob(customer.getDateOfBirth());
+	    currentResponse.setPan(customer.getPan());
+	    currentResponse.setAddress(customer.getAddress());
+	    currentResponse.setAccountNo(currentAccount.getAccountId().getAccountNo());
+	    currentResponse.setAccountType(currentAccount.getAccountId().getAccountType());
+	    currentResponse.setCurrentBalance(currentAccount.getCurrentBalance());
+	    
+	    result.add(currentResponse);
+	    
+	    return result;
+	    
 	}		
 }

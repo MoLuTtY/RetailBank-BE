@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,6 +51,16 @@ public class AccountController {
         }
 	}
 	
+	@GetMapping("/find-current-accounts/{customerId}")
+	public ResponseEntity<Account> findCurrentAccounts(@PathVariable Long customerId) {
+		Account response = accountService.findCurrentAccounts(customerId);
+		if (response!= null) {
+            return ResponseEntity.ok(response);
+        } else {
+        	return ResponseEntity.notFound().build();
+        }
+	}
+	
 	@GetMapping("/viewCustomer-by-accountNo-and-accountType/{accountNo}/{accountType}")
 	public ResponseEntity<Account> viewCustomerByAccountNoAndAccountType(@PathVariable Long accountNo, @PathVariable AccountType accountType) {
 		Account response = accountService.viewCustomerByAccountNoAndAccountType(accountNo,accountType);
@@ -77,6 +88,29 @@ public class AccountController {
 		return "Status : Deposit Successful";
 	}
 	
-
-
+	@GetMapping("/current-balance/{accountNo}/{accountType}")
+	public BigDecimal getCurrentBalance(@PathVariable Long accountNo, @PathVariable AccountType accountType) {
+		return accountService.getCurrentBalance(accountNo,accountType);
+	}
+	
+	@PutMapping("/update-currentBalance/{accountNo}/{accountType}/{newBalance}")
+	public void updateCurrentBalance(@PathVariable Long accountNo, @PathVariable AccountType accountType, @PathVariable BigDecimal newBalance) {
+		 accountService.updateCurrentBalance(accountNo,accountType,newBalance);
+	}
+	
+	@PostMapping("/withdraw/{accountNo}/{accountType}/{amount}")
+	public String withdraw(@PathVariable Long accountNo,@PathVariable AccountType accountType, @PathVariable BigDecimal amount) {
+		accountService.withdraw(accountNo, accountType, amount);
+		return "Status : Withdrawal Successful";
+	}
+	
+	@GetMapping("/getAccount/{accountNo}/{accountType}")
+	public Long getAccount(@PathVariable Long accountNo, @PathVariable AccountType accountType) {
+		return accountService.getAccount(accountNo,accountType);
+	}
+	
+	
+	
+	
+	
 }

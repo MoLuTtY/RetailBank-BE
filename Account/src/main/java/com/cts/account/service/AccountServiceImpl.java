@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.cts.account.exception.AccountNotFoundException;
+import com.cts.account.exception.MinimumBalanceException;
+
+import com.cts.account.feignClient.RuleFeignClient;
 import com.cts.account.feignClient.TransactionFeignClient;
 import com.cts.account.model.Account;
 import com.cts.account.model.AccountId;
@@ -14,12 +17,11 @@ import com.cts.account.model.AccountType;
 import com.cts.account.model.CreateAccountRequest;
 import com.cts.account.model.CreateAccountResponse;
 import com.cts.account.model.CreateTransactionRequest;
+import com.cts.account.model.RuleStatus;
 import com.cts.account.repository.AccountRepository;
 
 
 import jakarta.transaction.Transactional;
-
-
 
 @Service
 public class AccountServiceImpl implements AccountService{
@@ -28,10 +30,14 @@ public class AccountServiceImpl implements AccountService{
 	private AccountRepository accountRepository;
 	
 	private final TransactionFeignClient transactionFeignClient;
+	private final RuleFeignClient ruleFeignClient;
+	
 
     @Autowired
-    public AccountServiceImpl(TransactionFeignClient transactionFeignClient) {
+    public AccountServiceImpl(TransactionFeignClient transactionFeignClient, RuleFeignClient ruleFeignClient) {
         this.transactionFeignClient = transactionFeignClient;
+        this.ruleFeignClient = ruleFeignClient;
+       
     }
 	
 	private Long generateNextAccountNumber() {
@@ -110,7 +116,7 @@ public class AccountServiceImpl implements AccountService{
 	@Override
 	public void deposit(Long accountNo, AccountType accountType, BigDecimal amount) {
 		Account account = accountRepository.getAccountByNoAndType(accountNo,accountType);
-//		TransactionStatus status = new TransactionStatus();
+
 		if(account != null) {
 			BigDecimal currentBalance = account.getCurrentBalance();
 			currentBalance = currentBalance.add(amount);
@@ -118,28 +124,82 @@ public class AccountServiceImpl implements AccountService{
 			accountRepository.save(account);
 			
 			Date currentDate = new Date();
-			
-			
+						
 			CreateTransactionRequest request = new CreateTransactionRequest();
 			request.setAccountId(account.getId());
+			request.setCustomerId(account.getCustomerId());
 			request.setTransactionDate(currentDate);
 			request.setSourceAccountNo(account.getAccountId().getAccountNo());
 			request.setSourceAccountType(account.getAccountId().getAccountType());
 			request.setDepositAmount(amount);	
 			request.setClosingBalance(currentBalance);
-			transactionFeignClient.deposit(request);
-			
-			
-			
+			transactionFeignClient.deposit(request);			
 		} else {
 			throw new AccountNotFoundException("Account not found");
 			
 			
+		}				
+	}
+
+	@Override
+	public BigDecimal getCurrentBalance(Long accountNo, AccountType accountType) {
+		Account account =  accountRepository.getAccountByNoAndType(accountNo,accountType);
+		return account.getCurrentBalance();
+	}
+
+	@Override
+	public void updateCurrentBalance(Long accountNo, AccountType accountType, BigDecimal newBalance) {
+		Account account =  accountRepository.getAccountByNoAndType(accountNo,accountType);
+		if(account != null) {
+			account.setCurrentBalance(newBalance);
+		}
+		accountRepository.save(account);
+	}
+
+	@Override
+	public Account findCurrentAccounts(Long customerId) {
+		return accountRepository.findCurrentAccountByCustomerId(customerId);
+	}
+
+	@Override
+	public void withdraw(Long accountNo, AccountType accountType, BigDecimal amount) {
+		Account account = accountRepository.getAccountByNoAndType(accountNo, accountType);
+		if(account!=null) {
+			BigDecimal balance = account.getCurrentBalance().subtract(amount);
+			RuleStatus status = ruleFeignClient.evaluateMinBal(balance);
+			
+			if (status == RuleStatus.ALLOWED) {
+               account.setCurrentBalance(balance);
+               accountRepository.save(account);
+               
+               CreateTransactionRequest request = new CreateTransactionRequest();
+               Date currentDate = new Date();
+               
+               request.setAccountId(account.getId());
+               request.setCustomerId(account.getCustomerId());
+               request.setWithdrawalAmount(amount);
+               request.setClosingBalance(balance);
+               request.setSourceAccountNo(accountNo);
+               request.setSourceAccountType(accountType);
+               request.setTransactionDate(currentDate);
+               transactionFeignClient.withdraw(request);	
+            } else {
+            
+                throw new MinimumBalanceException("Withdrawal not allowed due to minimum balance rule");
+            }
+		} else {
+			throw new AccountNotFoundException("Account not found");
 		}
 		
-		
-				
 	}
+
+	@Override
+	public Long getAccount(Long accountNo, AccountType accountType) {
+		Account account = accountRepository.getAccountByNoAndType(accountNo, accountType);
+		return account.getId();
+	}
+
+	
 
 
 	

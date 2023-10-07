@@ -1,9 +1,0 @@
-package com.cts.account.service;
-
-import com.cts.account.model.Accounts;
-
-public interface AccountService {
-	
-	public CreateAccountResponse createAccount(Accounts account);
-
-}

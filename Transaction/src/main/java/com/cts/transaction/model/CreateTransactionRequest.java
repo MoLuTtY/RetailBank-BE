@@ -14,6 +14,7 @@ public class CreateTransactionRequest {
 	
 	private Date transactionDate;
 	private Long accountId;
+	private Long customerId;
 	private Long sourceAccountNo;
 	private AccountType sourceAccountType;
     private Long targetAccountNo;
