@@ -2,6 +2,8 @@
 <section name="Workbench">
 	<section name="MavenProjectImportWizardPage">
 		<list key="rootDirectory">
+			<item value="C:\Users\HP\CTS\retail-banking-system-be\Authentication-MS"/>
+			<item value="C:\Users\HP\CTS\retail-banking-system-be\authenticationservice"/>
 			<item value="C:\Users\HP\CTS\retail-banking-system-be\Authentication"/>
 			<item value="C:\Users\HP\CTS\retail-banking-system-be\Rules"/>
 			<item value="C:\Users\HP\CTS\retail-banking-system-be\Customer-MS"/>

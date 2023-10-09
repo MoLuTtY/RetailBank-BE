@@ -10,16 +10,18 @@ import org.springframework.stereotype.Service;
 
 import com.cts.account.model.Account;
 import com.cts.account.model.AccountType;
+import com.cts.customer.exception.AccessDeniedException;
 import com.cts.customer.exception.AccountNotFoundException;
 import com.cts.customer.exception.CustomerNotFoundException;
 import com.cts.customer.feignClient.AccountFeignClient;
 import com.cts.customer.feignClient.AuthFeignClient;
 import com.cts.customer.feignClient.TransactionFeignClient;
+import com.cts.customer.model.AppUser;
+import com.cts.customer.model.AuthenticationResponse;
 import com.cts.customer.model.CreateCustomerResponse;
 import com.cts.customer.model.Customer;
 import com.cts.customer.model.CustomerDetailsResponse;
 import com.cts.customer.model.CustomerProfileResponse;
-import com.cts.customer.model.SignupRequest;
 import com.cts.customer.repository.CustomerRepository;
 
 import feign.FeignException;
@@ -40,6 +42,29 @@ public class CustomerServiceImpl implements CustomerService{
 		this.transactionFeignClient = transactionFeignClient;
 		this.authFeignClient = authFeignClient;
     }
+    
+    @Override
+	public AuthenticationResponse hasPermission(String token) {
+		return authFeignClient.getValidity(token);
+	}
+    
+    @Override
+	public AuthenticationResponse hasCustomerPermission(String token) {
+		AuthenticationResponse validity = authFeignClient.getValidity(token);
+		if (!authFeignClient.getRole(validity.getUserid()).equals("CUSTOMER"))
+			throw new AccessDeniedException("NOT ALLOWED");
+		else
+			return validity;
+	}
+    
+    @Override
+	public AuthenticationResponse hasEmployeePermission(String token) {
+		AuthenticationResponse validity = authFeignClient.getValidity(token);
+		if (!authFeignClient.getRole(validity.getUserid()).equals("EMPLOYEE"))
+			throw new AccessDeniedException("NOT ALLOWED");
+		else
+			return validity;
+	}
 	
 	public Long generateCustomerId(Customer customer) {
       
@@ -68,10 +93,14 @@ public class CustomerServiceImpl implements CustomerService{
         	Long customerId = createdCustomer.getCustomerId(); 
             String message = "Customer created successfully";
             
-            SignupRequest request = new SignupRequest();
-            request.setPassword(customer.getPassword());
-            request.setUsername(Long.toString(customer.getCustomerId()));
-            authFeignClient.signup(request);
+//            SignupRequest request = new SignupRequest();
+//            request.setPassword(customer.getPassword());
+//            request.setUsername(Long.toString(customer.getCustomerId()));
+//            authFeignClient.signup(request);
+            
+            AppUser user = new AppUser(Long.toString(customer.getCustomerId()), Long.toString(customer.getCustomerId()), customer.getPassword(), null,
+					"CUSTOMER");
+            authFeignClient.createUser(user);
             
             return new CreateCustomerResponse(customerId, message);
         } catch (Exception e) {
