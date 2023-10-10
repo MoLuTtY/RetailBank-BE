@@ -99,6 +99,11 @@ public class AuthController {
 		return new ResponseEntity<>(createduser, HttpStatus.CREATED);
 
 	}
+	
+	@DeleteMapping("/delete-user/{customerId}")
+	public void deleteUser(@PathVariable String customerId) {
+		customerService.deleteUser(customerId);
+	}
 
 	/**
 	 * The find users method to find all users
@@ -121,14 +126,14 @@ public class AuthController {
 		return userRepository.findById(id).get().getRole();
 	}
 
-	@DeleteMapping("deleteCustomer/{id}")
-	@ResponseStatus(code = HttpStatus.OK)
-	public ResponseEntity<?> deleteCustomer(@RequestHeader("Authorization") String token, @PathVariable String id) {
-
-		System.out.println("Starting deletion of-->" + id);
-		customerService.deleteCustomer(id);
-		System.out.println("Deleted");
-		return new ResponseEntity<>("Deleted SUCCESSFULLY", HttpStatus.OK);
-	}
+//	@DeleteMapping("deleteCustomer/{id}")
+//	@ResponseStatus(code = HttpStatus.OK)
+//	public ResponseEntity<?> deleteCustomer(@RequestHeader("Authorization") String token, @PathVariable String id) {
+//
+//		System.out.println("Starting deletion of-->" + id);
+//		customerService.deleteCustomer(id);
+//		System.out.println("Deleted");
+//		return new ResponseEntity<>("Deleted SUCCESSFULLY", HttpStatus.OK);
+//	}
 
 }

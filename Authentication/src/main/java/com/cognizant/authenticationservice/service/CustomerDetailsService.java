@@ -37,9 +37,9 @@ public class CustomerDetailsService implements UserDetailsService {
 		}
 	}
 
-	public void deleteCustomer(String id) {
-		// TODO Auto-generated method stub
-		userRepo.deleteById(id);
+
+	public void deleteUser(String customerId) {
+		userRepo.deleteById(customerId);		
 	}
 
 }

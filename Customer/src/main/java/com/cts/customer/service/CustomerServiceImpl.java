@@ -93,11 +93,7 @@ public class CustomerServiceImpl implements CustomerService{
         	Long customerId = createdCustomer.getCustomerId(); 
             String message = "Customer created successfully";
             
-//            SignupRequest request = new SignupRequest();
-//            request.setPassword(customer.getPassword());
-//            request.setUsername(Long.toString(customer.getCustomerId()));
-//            authFeignClient.signup(request);
-            
+
             AppUser user = new AppUser(Long.toString(customer.getCustomerId()), Long.toString(customer.getCustomerId()), customer.getPassword(), null,
 					"CUSTOMER");
             authFeignClient.createUser(user);
@@ -177,6 +173,7 @@ public class CustomerServiceImpl implements CustomerService{
 			Account account = accountFeignClient.getCustomerSavingsAccount(customerId);
 			transactionFeignClient.deleteTransactions(account.getAccountId().getAccountNo());
 			accountFeignClient.deleteAllAccountsByAccountNo(account.getAccountId().getAccountNo());
+			authFeignClient.deleteUser(Long.toString(customerId));
 		
 			customerRepository.deleteById(customerId);
 			return "Customer with id "+customerId+" deleted successfully";
