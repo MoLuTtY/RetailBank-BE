@@ -12,12 +12,12 @@ import com.cts.transaction.model.TransactionStatus;
 
 public interface TransactionService {
 
-	TransactionStatus deposit(CreateTransactionRequest transaction);
-	void deleteTransactions(Long accountNo);
-	TransactionStatus withdraw(CreateTransactionRequest transaction);
-	TransactionStatus trasfer(Long source_account_no, AccountType source_account_type, Long target_account_no,
+	TransactionStatus deposit(String token, CreateTransactionRequest transaction);
+	void deleteTransactions(String token, Long accountNo);
+	TransactionStatus withdraw(String token,CreateTransactionRequest transaction);
+	TransactionStatus trasfer(String token,Long source_account_no, AccountType source_account_type, Long target_account_no,
 			BigDecimal amount);
-	List<GetTransactionsResponse> getTransactions(Long customerId);
-	List<GetTransactionsResponse> getTransactionsByDateRange(Long customerId, String dateFrom, String dateTo) throws ParseException, com.google.protobuf.TextFormat.ParseException;
+	List<GetTransactionsResponse> getTransactions(String token, Long customerId);
+	List<GetTransactionsResponse> getTransactionsByDateRange(String token, Long customerId, String dateFrom, String dateTo) throws ParseException, com.google.protobuf.TextFormat.ParseException;
 
 }

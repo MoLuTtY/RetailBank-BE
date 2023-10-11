@@ -10,16 +10,16 @@ import com.cts.account.model.CreateAccountResponse;
 
 public interface AccountService {
 	
-	public CreateAccountResponse createAccount(CreateAccountRequest createAccountRequest);
-	public Account findSavingsAccounts(Long customerId);	
-	public Account viewCustomerByAccountNoAndAccountType(Long accountNo, AccountType accountType);
-	void deleteAllAccountsByAccountNo(Long accountNo);
-	public Long getgetCustomerIdByAccountNo(Long accountNo);
-	public void deposit(Long accountNo, AccountType accounttype, BigDecimal amount);
-	public BigDecimal getCurrentBalance(Long accountNo, AccountType accountType);
-	public void updateCurrentBalance(Long accountNo, AccountType accountType, BigDecimal newBalance);
-	public Account findCurrentAccounts(Long customerId);
-	public void withdraw(Long accountNo, AccountType accountType, BigDecimal amount);
-	public Long getAccount(Long accountNo, AccountType accountType);
+	public CreateAccountResponse createAccount(String token, CreateAccountRequest createAccountRequest);
+	public Account findSavingsAccounts(String token,Long customerId);	
+	public Account viewCustomerByAccountNoAndAccountType(String token, Long accountNo, AccountType accountType);
+	void deleteAllAccountsByAccountNo(String token, Long accountNo);
+	public Long getgetCustomerIdByAccountNo(String token, Long accountNo);
+	public void deposit(String token, Long accountNo, AccountType accounttype, BigDecimal amount);
+	public BigDecimal getCurrentBalance(String token, Long accountNo, AccountType accountType);
+	public void updateCurrentBalance(String token,Long accountNo, AccountType accountType, BigDecimal newBalance);
+	public Account findCurrentAccounts(String token, Long customerId);
+	public void withdraw( String token, Long accountNo, AccountType accountType, BigDecimal amount);
+	public Long getAccount(String token, Long accountNo, AccountType accountType);
 	
 }

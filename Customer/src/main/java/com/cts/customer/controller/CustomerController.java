@@ -31,8 +31,8 @@ public class CustomerController {
     private CustomerService customerService;
      
     @PostMapping("/create-customer")
-    public ResponseEntity<CreateCustomerResponse> createCustomer(@RequestBody Customer customer) {
-        CreateCustomerResponse response = customerService.createCustomer(customer);
+    public ResponseEntity<CreateCustomerResponse> createCustomer(@RequestHeader("Authorization") String token,@RequestBody Customer customer) {
+        CreateCustomerResponse response = customerService.createCustomer(token,customer);
         if (response.getCustomerId() != null) {
             return ResponseEntity.ok(response);
         } else {
@@ -41,27 +41,27 @@ public class CustomerController {
     }
     
     @GetMapping("/allCustomers-with-savings-account")
-    public ResponseEntity<List<CustomerDetailsResponse>> allCustomersWithSavingsAccount() {
-        List<CustomerDetailsResponse> result = customerService.getAllCustomersWithSavingsAccount();
+    public ResponseEntity<List<CustomerDetailsResponse>> allCustomersWithSavingsAccount(@RequestHeader("Authorization") String token) {
+        List<CustomerDetailsResponse> result = customerService.getAllCustomersWithSavingsAccount(token);
         return ResponseEntity.ok(result);
     }
     
     @GetMapping("/search-customer/{accountNo}/{accountType}")
-    public ResponseEntity<CustomerDetailsResponse> searchCustomer(@PathVariable Long accountNo, @PathVariable AccountType accountType) {
+    public ResponseEntity<CustomerDetailsResponse> searchCustomer(@RequestHeader("Authorization") String token, @PathVariable Long accountNo, @PathVariable AccountType accountType) {
 
-            CustomerDetailsResponse response = customerService.searchCustomer(accountNo, accountType);
+            CustomerDetailsResponse response = customerService.searchCustomer(token, accountNo, accountType);
             return ResponseEntity.ok(response);
         
     }
     
     @DeleteMapping("/delete-customer/{customerId}")
-	public String deleteCustomer(@PathVariable Long customerId) {
-		return customerService.deleteCustomer(customerId);
+	public String deleteCustomer(@RequestHeader("Authorization") String token,@PathVariable Long customerId) {
+		return customerService.deleteCustomer(token, customerId);
 	}
     
     @GetMapping("/view-customer/{customerId}")
-    public ResponseEntity<List<CustomerProfileResponse>> viewCustomer(@PathVariable Long customerId) {
-    	List<CustomerProfileResponse> response = customerService.viewCustomer(customerId);
+    public ResponseEntity<List<CustomerProfileResponse>> viewCustomer(@RequestHeader("Authorization") String token,@PathVariable Long customerId) {
+    	List<CustomerProfileResponse> response = customerService.viewCustomer(token,customerId);
     	return ResponseEntity.ok(response);
     }
         

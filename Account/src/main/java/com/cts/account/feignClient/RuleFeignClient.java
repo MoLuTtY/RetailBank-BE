@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import com.cts.account.model.RuleStatus;
 
@@ -13,5 +14,5 @@ import com.cts.account.model.RuleStatus;
 public interface RuleFeignClient {
 
     @GetMapping("/api/rules/evaluateMinBal/{balance}")
-    RuleStatus evaluateMinBal(@PathVariable BigDecimal balance);
+    RuleStatus evaluateMinBal(@RequestHeader("Authorization") String token, @PathVariable BigDecimal balance);
 }

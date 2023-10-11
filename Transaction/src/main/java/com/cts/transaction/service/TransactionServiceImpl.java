@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.cts.transaction.exception.TransactionNotPossibleException;
 import com.cts.transaction.feignClient.AccountFeignClient;
+import com.cts.transaction.feignClient.AuthFeignClient;
 import com.cts.transaction.feignClient.RuleFeignClient;
 import com.cts.transaction.model.AccountType;
 import com.cts.transaction.model.CreateTransactionRequest;
@@ -34,16 +36,18 @@ public class TransactionServiceImpl implements TransactionService{
 	
 	private final AccountFeignClient accountFeignClient;
 	private final RuleFeignClient ruleFeignClient;
+	private final AuthFeignClient authFeignClient;
 	
     @Autowired
-    public TransactionServiceImpl(AccountFeignClient accountFeignClient,RuleFeignClient ruleFeignClient) {
+    public TransactionServiceImpl(AccountFeignClient accountFeignClient,RuleFeignClient ruleFeignClient,AuthFeignClient authFeignClient) {
         this.accountFeignClient = accountFeignClient;
         this.ruleFeignClient = ruleFeignClient;
+        this.authFeignClient = authFeignClient;
     }
 	
 
 	@Override
-	public TransactionStatus deposit(CreateTransactionRequest transaction) {
+	public TransactionStatus deposit(String token, CreateTransactionRequest transaction) {
 		Transaction transactionObj = new Transaction();
 		transactionObj.setAccountId(transaction.getAccountId());
 		transactionObj.setCustomerId(transaction.getCustomerId());
@@ -68,7 +72,7 @@ public class TransactionServiceImpl implements TransactionService{
 	@SuppressWarnings("deprecation")
 	@Transactional
 	@Override
-	public void deleteTransactions(Long accountNo) {
+	public void deleteTransactions(String token, Long accountNo) {
 		
         List<Transaction> transactions = transactionRepository.findAll();
         List<Transaction> transactionsToDelete = new ArrayList<>();
@@ -83,7 +87,7 @@ public class TransactionServiceImpl implements TransactionService{
 	}
 
 	@Override
-	public TransactionStatus withdraw(CreateTransactionRequest transaction) {
+	public TransactionStatus withdraw(String token,CreateTransactionRequest transaction) {
 		Transaction transactionObj = new Transaction();
 		transactionObj.setAccountId(transaction.getAccountId());
 		transactionObj.setCustomerId(transaction.getCustomerId());
@@ -105,25 +109,26 @@ public class TransactionServiceImpl implements TransactionService{
 	}
 
 	@Override
-	public TransactionStatus trasfer(Long source_account_no, AccountType source_account_type, Long target_account_no,
+	public TransactionStatus trasfer(String token,Long source_account_no, AccountType source_account_type, Long target_account_no,
 			BigDecimal amount) {
-		BigDecimal sourceCurrentBalance = accountFeignClient.getCurrentBalance(source_account_no,source_account_type);
+
+		BigDecimal sourceCurrentBalance = accountFeignClient.getCurrentBalance(token,source_account_no,source_account_type);
 		BigDecimal sourceNewBalance = sourceCurrentBalance.subtract(amount);
 		
-		BigDecimal targetCurrentBalance = accountFeignClient.getCurrentBalance(target_account_no, AccountType.SAVINGS);
+		BigDecimal targetCurrentBalance = accountFeignClient.getCurrentBalance(token,target_account_no, AccountType.SAVINGS);
 		BigDecimal targetNewBalance = targetCurrentBalance.add(amount);
 		
-		RuleStatus status = ruleFeignClient.evaluateMinBal(sourceNewBalance);
+		RuleStatus status = ruleFeignClient.evaluateMinBal(token,sourceNewBalance);
 		TransactionStatus status1 = new TransactionStatus();
 		if (status == RuleStatus.ALLOWED) {
-			accountFeignClient.updateCurrentBalance(source_account_no,source_account_type,sourceNewBalance);
-			accountFeignClient.updateCurrentBalance(target_account_no, AccountType.SAVINGS, targetNewBalance);
+			accountFeignClient.updateCurrentBalance(token,source_account_no,source_account_type,sourceNewBalance);
+			accountFeignClient.updateCurrentBalance(token,target_account_no, AccountType.SAVINGS, targetNewBalance);
 			
 			Date currentDate = new Date();
 			
 			Transaction transaction = new Transaction();
-			transaction.setAccountId(accountFeignClient.getAccount(source_account_no, source_account_type));
-			transaction.setCustomerId(accountFeignClient.getCustomerIdByAccountNo(source_account_no));
+			transaction.setAccountId(accountFeignClient.getAccount(token,source_account_no, source_account_type));
+			transaction.setCustomerId(accountFeignClient.getCustomerIdByAccountNo(token,source_account_no));
 			transaction.setSourceAccountNo(source_account_no);
 			transaction.setSourceAccountType(source_account_type);
 			transaction.setTargetAccountNo(target_account_no);
@@ -131,21 +136,19 @@ public class TransactionServiceImpl implements TransactionService{
 			transaction.setTransactionDate(currentDate);
 			transaction.setClosingBalance(sourceNewBalance);
 			transactionRepository.save(transaction);  
-			
-			
+					
 			status1.setTransactionId(transaction.getTransactionId());
 			status1.setStatus("Withdrawal successful");
 			
 		} else {
 			
 		}
-		return status1;
-		
+		return status1;		
 	}
 
 
 	@Override
-	public List<GetTransactionsResponse> getTransactions(Long customerId) {
+	public List<GetTransactionsResponse> getTransactions(String token, Long customerId) {
 		List<GetTransactionsResponse> result = new ArrayList<>();
 		List<Transaction> transactions = transactionRepository.getTransactionsByCustomerId(customerId);
 		
@@ -168,8 +171,8 @@ public class TransactionServiceImpl implements TransactionService{
 	}
 
 	@Override
-	public List<GetTransactionsResponse> getTransactionsByDateRange(Long customerId, String dateFrom, String dateTo) throws java.text.ParseException, ParseException {
-	    List<GetTransactionsResponse> transactions = getTransactions(customerId);
+	public List<GetTransactionsResponse> getTransactionsByDateRange(String token, Long customerId, String dateFrom, String dateTo) throws java.text.ParseException, ParseException {
+	    List<GetTransactionsResponse> transactions = getTransactions(token, customerId);
 	    List<GetTransactionsResponse> filteredTransactions = new ArrayList<>();
 
 	    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");

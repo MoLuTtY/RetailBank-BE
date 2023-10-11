@@ -28,7 +28,7 @@ public class RuleServiceImpl implements RuleService{
 
     
     @Override
-    public ServicechargeResponse serviceCharge(Long accountNo, AccountType accountType) {
+    public ServicechargeResponse serviceCharge(String token, Long accountNo, AccountType accountType) {
         
         LocalDate currentDate = LocalDate.now();
 
@@ -37,7 +37,7 @@ public class RuleServiceImpl implements RuleService{
         ServicechargeResponse lastDeduction = servicechargeRepository.findTopByAccountNoAndAccountTypeOrderByDeductionDateDesc(accountNo, accountType);
 
         if (lastDeduction == null || lastDeduction.getDeductionDate().isBefore(oneMonthAgo)) {
-            BigDecimal currentBalance = accountFeignClient.getCurrentBalance(accountNo, accountType);
+            BigDecimal currentBalance = accountFeignClient.getCurrentBalance(token, accountNo, accountType);
             BigDecimal minimumBalance = new BigDecimal("1000.00");
             ServicechargeResponse response = new ServicechargeResponse();
 
@@ -49,7 +49,7 @@ public class RuleServiceImpl implements RuleService{
                 response.setServiceCharge(100);
                 response.setReference("Deducted");
                 BigDecimal newBalance = currentBalance.subtract(amountToSubtract);
-                accountFeignClient.updateCurrentBalance(accountNo, accountType, newBalance);
+                accountFeignClient.updateCurrentBalance(token, accountNo, accountType, newBalance);
                 servicechargeRepository.save(response);
             } else {
             	response.setAccountNo(accountNo);
@@ -75,7 +75,7 @@ public class RuleServiceImpl implements RuleService{
 
 
 	@Override
-	public RuleStatus evaluateMinBal(BigDecimal balance) {
+	public RuleStatus evaluateMinBal(String token,BigDecimal balance) {
 		 BigDecimal minimumBalance = BigDecimal.valueOf(1000);
 		 if (balance.compareTo(minimumBalance) >= 0) {
 			 System.out.println("----------ALLOWED---------");

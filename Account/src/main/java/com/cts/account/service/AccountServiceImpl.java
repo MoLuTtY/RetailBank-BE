@@ -52,7 +52,7 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	@Override
-	public CreateAccountResponse createAccount(CreateAccountRequest createAccountRequest) {
+	public CreateAccountResponse createAccount(String token, CreateAccountRequest createAccountRequest) {
 		
 		AccountId savingsAccountId = new AccountId();
 		savingsAccountId.setAccountNo(generateNextAccountNumber());
@@ -86,13 +86,13 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	@Override
-	public Account findSavingsAccounts(Long customerId) {
+	public Account findSavingsAccounts(String token, Long customerId) {
 		return accountRepository.findSavingsAccountByCustomerId(customerId);
 		
 	}
 
 	@Override
-	public Account viewCustomerByAccountNoAndAccountType(Long accountNo, AccountType accountType) {
+	public Account viewCustomerByAccountNoAndAccountType(String token, Long accountNo, AccountType accountType) {
 	    Account account = accountRepository.viewCustomerByAccountNoAndAccountType(accountNo, accountType);
 	    
 	    if (account != null) {
@@ -103,18 +103,18 @@ public class AccountServiceImpl implements AccountService{
 	}
 	
 	@Transactional
-    public void deleteAllAccountsByAccountNo(Long accountNo) {
+    public void deleteAllAccountsByAccountNo(String token, Long accountNo) {
         accountRepository.deleteAllByAccountIdAccountNo(accountNo);
     }
 
 	@Override
-	public Long getgetCustomerIdByAccountNo(Long accountNo) {
+	public Long getgetCustomerIdByAccountNo(String token,Long accountNo) {
 		Account account = accountRepository.getCustomerId(accountNo);
 		return account.getCustomerId();
 	}
 
 	@Override
-	public void deposit(Long accountNo, AccountType accountType, BigDecimal amount) {
+	public void deposit(String token, Long accountNo, AccountType accountType, BigDecimal amount) {
 		Account account = accountRepository.getAccountByNoAndType(accountNo,accountType);
 
 		if(account != null) {
@@ -133,7 +133,7 @@ public class AccountServiceImpl implements AccountService{
 			request.setSourceAccountType(account.getAccountId().getAccountType());
 			request.setDepositAmount(amount);	
 			request.setClosingBalance(currentBalance);
-			transactionFeignClient.deposit(request);			
+			transactionFeignClient.deposit(token, request);			
 		} else {
 			throw new AccountNotFoundException("Account not found");
 			
@@ -142,13 +142,13 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	@Override
-	public BigDecimal getCurrentBalance(Long accountNo, AccountType accountType) {
+	public BigDecimal getCurrentBalance(String token, Long accountNo, AccountType accountType) {
 		Account account =  accountRepository.getAccountByNoAndType(accountNo,accountType);
 		return account.getCurrentBalance();
 	}
 
 	@Override
-	public void updateCurrentBalance(Long accountNo, AccountType accountType, BigDecimal newBalance) {
+	public void updateCurrentBalance(String token, Long accountNo, AccountType accountType, BigDecimal newBalance) {
 		Account account =  accountRepository.getAccountByNoAndType(accountNo,accountType);
 		if(account != null) {
 			account.setCurrentBalance(newBalance);
@@ -157,16 +157,16 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	@Override
-	public Account findCurrentAccounts(Long customerId) {
+	public Account findCurrentAccounts(String token, Long customerId) {
 		return accountRepository.findCurrentAccountByCustomerId(customerId);
 	}
 
 	@Override
-	public void withdraw(Long accountNo, AccountType accountType, BigDecimal amount) {
+	public void withdraw( String token, Long accountNo, AccountType accountType, BigDecimal amount) {
 		Account account = accountRepository.getAccountByNoAndType(accountNo, accountType);
 		if(account!=null) {
 			BigDecimal balance = account.getCurrentBalance().subtract(amount);
-			RuleStatus status = ruleFeignClient.evaluateMinBal(balance);
+			RuleStatus status = ruleFeignClient.evaluateMinBal(token,balance);
 			
 			if (status == RuleStatus.ALLOWED) {
                account.setCurrentBalance(balance);
@@ -182,7 +182,7 @@ public class AccountServiceImpl implements AccountService{
                request.setSourceAccountNo(accountNo);
                request.setSourceAccountType(accountType);
                request.setTransactionDate(currentDate);
-               transactionFeignClient.withdraw(request);	
+               transactionFeignClient.withdraw(token,request);	
             } else {
             
                 throw new MinimumBalanceException("Withdrawal not allowed due to minimum balance rule");
@@ -194,7 +194,7 @@ public class AccountServiceImpl implements AccountService{
 	}
 
 	@Override
-	public Long getAccount(Long accountNo, AccountType accountType) {
+	public Long getAccount(String token,Long accountNo, AccountType accountType) {
 		Account account = accountRepository.getAccountByNoAndType(accountNo, accountType);
 		return account.getId();
 	}

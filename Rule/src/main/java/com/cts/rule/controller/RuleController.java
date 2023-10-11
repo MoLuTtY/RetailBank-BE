@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,14 +25,14 @@ public class RuleController {
 	private RuleService ruleService;
 	
 	@GetMapping(value = "/service-charge/{accountNo}/{accountType}", produces = "application/json")
-	public ResponseEntity<ServicechargeResponse> serviceCharge(@PathVariable Long accountNo, @PathVariable AccountType accountType) {
-		ServicechargeResponse response = ruleService.serviceCharge(accountNo, accountType);
+	public ResponseEntity<ServicechargeResponse> serviceCharge(@RequestHeader("Authorization") String token, @PathVariable Long accountNo, @PathVariable AccountType accountType) {
+		ServicechargeResponse response = ruleService.serviceCharge(token, accountNo, accountType);
 	    return ResponseEntity.ok(response);
 	}
 	
 	@GetMapping(value = "/evaluateMinBal/{balance}", produces = "application/json")
-	public ResponseEntity<RuleStatus> evaluateMinBal(@PathVariable BigDecimal balance) {
-		RuleStatus status = ruleService.evaluateMinBal(balance);
+	public ResponseEntity<RuleStatus> evaluateMinBal(@RequestHeader("Authorization") String token,@PathVariable BigDecimal balance) {
+		RuleStatus status = ruleService.evaluateMinBal(token,balance);
 		return ResponseEntity.ok(status);
 	}
 }

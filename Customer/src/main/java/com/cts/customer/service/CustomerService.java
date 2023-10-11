@@ -15,11 +15,11 @@ import com.cts.customer.model.CustomerProfileResponse;
 
 public interface CustomerService {
 
-	CreateCustomerResponse createCustomer(Customer customer);
-	List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount();
-	CustomerDetailsResponse searchCustomer(Long accountNo, AccountType accountType) throws AccountNotFoundException;
-	String deleteCustomer(Long customerId);
-	List<CustomerProfileResponse> viewCustomer(Long customerId);
+	CreateCustomerResponse createCustomer(String token,Customer customer);
+	List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount(String token);
+	CustomerDetailsResponse searchCustomer(String token, Long accountNo, AccountType accountType) throws AccountNotFoundException;
+	String deleteCustomer(String token, Long customerId);
+	List<CustomerProfileResponse> viewCustomer(String token, Long customerId);
 	AuthenticationResponse hasPermission(String token);
 	AuthenticationResponse hasCustomerPermission(String token);
     AuthenticationResponse hasEmployeePermission(String token);

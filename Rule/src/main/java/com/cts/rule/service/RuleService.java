@@ -8,8 +8,8 @@ import com.cts.rule.model.ServicechargeResponse;
 
 public interface RuleService {
 
-	ServicechargeResponse serviceCharge(Long accountNo, AccountType accountType);
+	ServicechargeResponse serviceCharge(String token, Long accountNo, AccountType accountType);
 
-	RuleStatus evaluateMinBal(BigDecimal balance);
+	RuleStatus evaluateMinBal(String token,BigDecimal balance);
 
 }

@@ -43,6 +43,7 @@ public class CustomerServiceImpl implements CustomerService{
 		this.authFeignClient = authFeignClient;
     }
     
+    
     @Override
 	public AuthenticationResponse hasPermission(String token) {
 		return authFeignClient.getValidity(token);
@@ -51,7 +52,7 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
 	public AuthenticationResponse hasCustomerPermission(String token) {
 		AuthenticationResponse validity = authFeignClient.getValidity(token);
-		if (!authFeignClient.getRole(validity.getUserid()).equals("CUSTOMER"))
+		if (!authFeignClient.getRole(token, validity.getUserid()).equals("CUSTOMER"))
 			throw new AccessDeniedException("NOT ALLOWED");
 		else
 			return validity;
@@ -60,7 +61,7 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
 	public AuthenticationResponse hasEmployeePermission(String token) {
 		AuthenticationResponse validity = authFeignClient.getValidity(token);
-		if (!authFeignClient.getRole(validity.getUserid()).equals("EMPLOYEE"))
+		if (!authFeignClient.getRole(token, validity.getUserid()).equals("EMPLOYEE"))
 			throw new AccessDeniedException("NOT ALLOWED");
 		else
 			return validity;
@@ -80,7 +81,7 @@ public class CustomerServiceImpl implements CustomerService{
         return generatedCustomerId;
     }
 
-	public CreateCustomerResponse createCustomer(Customer customer) {
+	public CreateCustomerResponse createCustomer(String token,Customer customer) {
 		if (customer.getCustomerName() == null || customer.getPassword() == null ||
 	            customer.getDateOfBirth() == null || customer.getPan() == null ||
 	            customer.getAddress() == null) {
@@ -96,7 +97,7 @@ public class CustomerServiceImpl implements CustomerService{
 
             AppUser user = new AppUser(Long.toString(customer.getCustomerId()), Long.toString(customer.getCustomerId()), customer.getPassword(), null,
 					"CUSTOMER");
-            authFeignClient.createUser(user);
+            authFeignClient.createUser(token,user);
             
             return new CreateCustomerResponse(customerId, message);
         } catch (Exception e) {
@@ -107,7 +108,7 @@ public class CustomerServiceImpl implements CustomerService{
         
     }
 
-	public List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount() {
+	public List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount(String token) {
 		
         List<CustomerDetailsResponse> result = new ArrayList<>();
 
@@ -116,7 +117,7 @@ public class CustomerServiceImpl implements CustomerService{
         for (Customer customer : customers) {
             Long customerId = customer.getCustomerId();
 
-            Account account = accountFeignClient.getCustomerSavingsAccount(customerId);
+            Account account = accountFeignClient.getCustomerSavingsAccount(token,customerId);
 
             if (account != null) {
                 CustomerDetailsResponse customerDetails = new CustomerDetailsResponse();
@@ -137,9 +138,9 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
 	@Override
-	public CustomerDetailsResponse searchCustomer(Long accountNo, AccountType accountType) {
+	public CustomerDetailsResponse searchCustomer(String token, Long accountNo, AccountType accountType) {
 	    try {
-	        Account account = accountFeignClient.viewCustomerByAccountNoAndAccountType(accountNo, accountType);
+	        Account account = accountFeignClient.viewCustomerByAccountNoAndAccountType(token, accountNo, accountType);
 
 	        if (account != null) {
 	            Customer customer = customerRepository.searchCustomer(account.getCustomerId());
@@ -163,17 +164,17 @@ public class CustomerServiceImpl implements CustomerService{
 	}
 
 	@Override
-	public String deleteCustomer(Long customerId) {
+	public String deleteCustomer(String token,Long customerId) {
 		Optional<Customer> customer = customerRepository.findById(customerId);
 		if(!customer.isPresent()) {
 			throw new CustomerNotFoundException("Customer doesn't exist");
 		}
 		else {
 		
-			Account account = accountFeignClient.getCustomerSavingsAccount(customerId);
-			transactionFeignClient.deleteTransactions(account.getAccountId().getAccountNo());
-			accountFeignClient.deleteAllAccountsByAccountNo(account.getAccountId().getAccountNo());
-			authFeignClient.deleteUser(Long.toString(customerId));
+			Account account = accountFeignClient.getCustomerSavingsAccount(token,customerId);
+			transactionFeignClient.deleteTransactions(token,account.getAccountId().getAccountNo());
+			accountFeignClient.deleteAllAccountsByAccountNo(token, account.getAccountId().getAccountNo());
+			authFeignClient.deleteUser(token, Long.toString(customerId));
 		
 			customerRepository.deleteById(customerId);
 			return "Customer with id "+customerId+" deleted successfully";
@@ -181,12 +182,12 @@ public class CustomerServiceImpl implements CustomerService{
 	}
 
 	@Override
-	public List<CustomerProfileResponse> viewCustomer(Long customerId) {
+	public List<CustomerProfileResponse> viewCustomer(String token,Long customerId) {
 		Customer customer = customerRepository.getById(customerId);
 		List<CustomerProfileResponse> result = new ArrayList<>();
 		
-		Account savingsAccount = accountFeignClient.getCustomerSavingsAccount(customerId);
-		Account currentAccount = accountFeignClient.findCurrentAccounts(customerId);
+		Account savingsAccount = accountFeignClient.getCustomerSavingsAccount(token,customerId);
+		Account currentAccount = accountFeignClient.findCurrentAccounts(token, customerId);
 		
 	    CustomerProfileResponse savingsResponse = new CustomerProfileResponse();
 	    savingsResponse.setName(customer.getCustomerName());	

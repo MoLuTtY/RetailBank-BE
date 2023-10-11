@@ -1,8 +1,4 @@
 package com.cognizant.authenticationservice.controller;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +40,6 @@ import com.cognizant.authenticationservice.service.Validationservice;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * The AuthController class for request controller
- *
- */
 @Slf4j
 @RestController
 @CrossOrigin()
@@ -77,63 +69,46 @@ public class AuthController {
 	public ResponseEntity<AppUser> login(@RequestBody LoginRequest appUserloginCredentials)
 			throws UsernameNotFoundException, AppUserNotFoundException {
 		AppUser user = loginService.userLogin(appUserloginCredentials);
-		log.info("Credentials ----->{}", user);
 		return new ResponseEntity<>(user, HttpStatus.ACCEPTED);
 	}
 
 	@GetMapping("/validateToken")
 	public AuthenticationResponse getValidity(@RequestHeader("Authorization") final String token) {
-		log.info("Token Validation ----->{}", token);
 		return validationService.validate(token);
 	}
 
 	@PostMapping("/createUser")
-	public ResponseEntity<?> createUser(@RequestBody AppUser appUserCredentials) {
+	public ResponseEntity<?> createUser(@RequestHeader("Authorization") String token, @RequestBody AppUser appUserCredentials) {
 		AppUser createduser = null;
 		try {
 			createduser = userRepository.save(appUserCredentials);
 		} catch (Exception e) {
 			return new ResponseEntity<String>("Not created", HttpStatus.NOT_ACCEPTABLE);
 		}
-		log.info("user creation---->{}", createduser);
 		return new ResponseEntity<>(createduser, HttpStatus.CREATED);
 
 	}
 	
 	@DeleteMapping("/delete-user/{customerId}")
-	public void deleteUser(@PathVariable String customerId) {
-		customerService.deleteUser(customerId);
+	public void deleteUser(@RequestHeader("Authorization") String token, @PathVariable String customerId) {
+		customerService.deleteUser(token, customerId);
 	}
 
-	/**
-	 * The find users method to find all users
-	 *
-	 */
-	@PreAuthorize("hasRole('ROLE_EMPLOYEE')")
-	@GetMapping("/find")
-	public ResponseEntity<List<AppUser>> findUsers(@RequestHeader("Authorization") final String token) {
-		List<AppUser> createduser = new ArrayList<>();
-		List<AppUser> findAll = userRepository.findAll();
-		findAll.forEach(emp -> createduser.add(emp));
-		System.out.println(createduser);
-		log.info("All Users  ----->{}", findAll);
-		return new ResponseEntity<>(createduser, HttpStatus.CREATED);
-
-	}
+//	@PreAuthorize("hasRole('ROLE_EMPLOYEE')")
+//	@GetMapping("/find")
+//	public ResponseEntity<List<AppUser>> findUsers(@RequestHeader("Authorization") final String token) {
+//		List<AppUser> createduser = new ArrayList<>();
+//		List<AppUser> findAll = userRepository.findAll();
+//		findAll.forEach(emp -> createduser.add(emp));
+//		System.out.println(createduser);
+//		log.info("All Users  ----->{}", findAll);
+//		return new ResponseEntity<>(createduser, HttpStatus.CREATED);
+//
+//	}
 
 	@GetMapping("/role/{id}")
-	public String getRole(@PathVariable("id") String id) {
+	public String getRole(@RequestHeader("Authorization") String token, @PathVariable("id") String id) {
 		return userRepository.findById(id).get().getRole();
 	}
-
-//	@DeleteMapping("deleteCustomer/{id}")
-//	@ResponseStatus(code = HttpStatus.OK)
-//	public ResponseEntity<?> deleteCustomer(@RequestHeader("Authorization") String token, @PathVariable String id) {
-//
-//		System.out.println("Starting deletion of-->" + id);
-//		customerService.deleteCustomer(id);
-//		System.out.println("Deleted");
-//		return new ResponseEntity<>("Deleted SUCCESSFULLY", HttpStatus.OK);
-//	}
 
 }

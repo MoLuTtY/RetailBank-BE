@@ -35,7 +35,7 @@ public class LoginService {
 		String token = "";
 		
 		AppUser user = null;
-		user = userRepo.findById(appuser.getUsername()).orElse(null); //.get()
+		user = userRepo.findById(appuser.getUsername()).orElse(null); 
 		
 		log.info("Password From DB-->{}" ,userdetails.getPassword());
 		log.info("Password From Request-->{}", encoder.encode(appuser.getPassword()) );

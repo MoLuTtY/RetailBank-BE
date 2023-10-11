@@ -17,7 +17,6 @@ import com.cognizant.authenticationservice.repository.UserRepository;
 @Service
 public class CustomerDetailsService implements UserDetailsService {
 
-	// Class to Implement UserDetailsService in Spring security
 
 	@Autowired
 	private UserRepository userRepo;
@@ -26,7 +25,7 @@ public class CustomerDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String userid) throws UsernameNotFoundException {
 
 		AppUser user = null;
-		user = userRepo.findById(userid).orElse(null); //.get()
+		user = userRepo.findById(userid).orElse(null); 
 
 		if (user != null) {
 			List<GrantedAuthority> grantedAuthorities = AuthorityUtils
@@ -38,7 +37,7 @@ public class CustomerDetailsService implements UserDetailsService {
 	}
 
 
-	public void deleteUser(String customerId) {
+	public void deleteUser(String token, String customerId) {
 		userRepo.deleteById(customerId);		
 	}
 
