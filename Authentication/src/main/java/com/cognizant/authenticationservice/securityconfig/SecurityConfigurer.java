@@ -35,13 +35,15 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
 	@Override
 	public void configure(WebSecurity web) throws Exception {
-		web.ignoring().antMatchers("/login", "/validateToken", "/role/**","/delete-user/**");
+		web.ignoring().antMatchers("/login");
 	}
+
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeRequests().antMatchers("/auth-ms/emp").hasRole("EMPLOYEE")
-		.antMatchers("/*").permitAll().anyRequest().authenticated().and().exceptionHandling().and().sessionManagement()
+		http.csrf().disable().authorizeRequests()
+//		.antMatchers("/api/customers/create-customer").hasRole("ROLE_EMPLOYEE")
+		.anyRequest().authenticated().and().exceptionHandling().and().sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);

@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Component
-@Slf4j
 public class LoginService {
 
 	@Autowired
@@ -37,8 +36,6 @@ public class LoginService {
 		AppUser user = null;
 		user = userRepo.findById(appuser.getUsername()).orElse(null); 
 		
-		log.info("Password From DB-->{}" ,userdetails.getPassword());
-		log.info("Password From Request-->{}", encoder.encode(appuser.getPassword()) );
 		
 		String userRole = userRepo.findById(appuser.getUsername()).get().getRole();
 

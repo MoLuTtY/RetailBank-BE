@@ -18,7 +18,7 @@ public interface AuthFeignClient {
 	public AuthenticationResponse getValidity(@RequestHeader("Authorization") String token);
 
 	@GetMapping("/role/{id}")
-	public String getRole(@PathVariable("id") String id);
+	public String getRole(@RequestHeader("Authorization") String token, @PathVariable("id") String id);
 	
 
 }

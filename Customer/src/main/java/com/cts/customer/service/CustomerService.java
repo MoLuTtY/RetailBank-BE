@@ -1,9 +1,6 @@
 package com.cts.customer.service;
 
 import java.util.List;
-
-//import javax.security.auth.login.AccountNotFoundException;
-
 import com.cts.account.model.AccountType;
 import com.cts.customer.exception.AccountNotFoundException;
 import com.cts.customer.model.AuthenticationResponse;

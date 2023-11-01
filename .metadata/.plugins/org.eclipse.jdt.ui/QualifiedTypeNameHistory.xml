@@ -58,6 +58,6 @@
     <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.PathVariable"/>
     <fullyQualifiedTypeName name="com.cts.customer.model.AuthenticationResponse"/>
     <fullyQualifiedTypeName name="java.nio.file.AccessDeniedException"/>
-    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestHeader"/>
     <fullyQualifiedTypeName name="com.cognizant.authenticationservice.model.LoginRequest"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestHeader"/>
 </qualifiedTypeNameHistroy>

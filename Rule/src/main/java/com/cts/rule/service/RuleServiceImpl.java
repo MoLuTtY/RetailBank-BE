@@ -7,11 +7,15 @@ import java.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cts.rule.exception.AccessDeniedException;
 import com.cts.rule.feignClient.AccountFeignClient;
+import com.cts.rule.feignClient.AuthFeignClient;
 import com.cts.rule.model.AccountType;
+import com.cts.rule.model.AuthenticationResponse;
 import com.cts.rule.model.RuleStatus;
 import com.cts.rule.model.ServicechargeResponse;
 import com.cts.rule.repository.ServicechargeRepository;
+
 
 @Service
 public class RuleServiceImpl implements RuleService{
@@ -20,11 +24,37 @@ public class RuleServiceImpl implements RuleService{
 	private ServicechargeRepository servicechargeRepository;
 	
 	private final AccountFeignClient accountFeignClient;
+	private final AuthFeignClient authFeignClient;
 
     @Autowired
-    public RuleServiceImpl(AccountFeignClient accountFeignClient) {
+    public RuleServiceImpl(AccountFeignClient accountFeignClient, AuthFeignClient authFeignClient) {
         this.accountFeignClient = accountFeignClient;
+        this.authFeignClient = authFeignClient;
     }
+    
+    @Override
+   	public AuthenticationResponse hasPermission(String token) {
+   		return authFeignClient.getValidity(token);
+   	}
+       
+       @Override
+   	public AuthenticationResponse hasCustomerPermission(String token) {
+   		AuthenticationResponse validity = authFeignClient.getValidity(token);
+   		if (!authFeignClient.getRole(token, validity.getUserid()).equals("CUSTOMER"))
+   			throw new AccessDeniedException("NOT ALLOWED");
+   		else
+   			return validity;
+   	}
+       
+       @Override
+   	public AuthenticationResponse hasEmployeePermission(String token) {
+   		AuthenticationResponse validity = authFeignClient.getValidity(token);
+
+   		if (!authFeignClient.getRole(token, validity.getUserid()).equals("EMPLOYEE"))
+   			throw new AccessDeniedException("NOT ALLOWED");
+   		else
+   			return validity;
+   	}
 
     
     @Override

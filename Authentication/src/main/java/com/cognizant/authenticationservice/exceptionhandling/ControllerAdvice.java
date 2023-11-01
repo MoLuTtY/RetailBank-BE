@@ -3,12 +3,14 @@ package com.cognizant.authenticationservice.exceptionhandling;
 import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.cognizant.authenticationservice.errorhandling.ErrorMessage;
+
 
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
@@ -41,6 +43,8 @@ public class ControllerAdvice
 	{
 		return new ErrorMessage(HttpStatus.UNAUTHORIZED,LocalDateTime.now(),"Not Authorized --> Token is Invalid..");
 	}
+	
+	
 
 
 }

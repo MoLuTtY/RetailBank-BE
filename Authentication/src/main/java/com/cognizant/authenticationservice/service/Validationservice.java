@@ -21,16 +21,14 @@ public class Validationservice {
 	        token = token.substring(7); 
 	    }
 
-	    System.out.println("Received token: {}"+ token);
 	    if (jwtutil.validateToken(token)) {
 	        String extractedUsername = jwtutil.extractUsername(token);
 	       
-	        System.out.println("Valid token for user: {}"+ extractedUsername);
 	        authenticationResponse.setUserid(extractedUsername);
 	        authenticationResponse.setValid(true);
 	        authenticationResponse.setName(userRepo.findById(extractedUsername).get().getUsername());
 	    } else {
-	    	System.out.println("Token validation failed");
+	    	
 	        authenticationResponse.setValid(false);
 	    }
 

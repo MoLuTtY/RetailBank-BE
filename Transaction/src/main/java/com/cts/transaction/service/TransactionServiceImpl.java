@@ -9,14 +9,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import com.cts.transaction.exception.TransactionNotPossibleException;
+import com.cts.transaction.exception.AccessDeniedException;
 import com.cts.transaction.feignClient.AccountFeignClient;
 import com.cts.transaction.feignClient.AuthFeignClient;
 import com.cts.transaction.feignClient.RuleFeignClient;
 import com.cts.transaction.model.AccountType;
+import com.cts.transaction.model.AuthenticationResponse;
 import com.cts.transaction.model.CreateTransactionRequest;
 import com.cts.transaction.model.GetTransactionsResponse;
 import com.cts.transaction.model.RuleStatus;
@@ -44,6 +44,30 @@ public class TransactionServiceImpl implements TransactionService{
         this.ruleFeignClient = ruleFeignClient;
         this.authFeignClient = authFeignClient;
     }
+    
+    @Override
+   	public AuthenticationResponse hasPermission(String token) {
+   		return authFeignClient.getValidity(token);
+   	}
+       
+       @Override
+   	public AuthenticationResponse hasCustomerPermission(String token) {
+   		AuthenticationResponse validity = authFeignClient.getValidity(token);
+   		if (!authFeignClient.getRole(token, validity.getUserid()).equals("CUSTOMER"))
+   			throw new AccessDeniedException("NOT ALLOWED");
+   		else
+   			return validity;
+   	}
+       
+       @Override
+   	public AuthenticationResponse hasEmployeePermission(String token) {
+   		AuthenticationResponse validity = authFeignClient.getValidity(token);
+
+   		if (!authFeignClient.getRole(token, validity.getUserid()).equals("EMPLOYEE"))
+   			throw new AccessDeniedException("NOT ALLOWED");
+   		else
+   			return validity;
+   	}
 	
 
 	@Override

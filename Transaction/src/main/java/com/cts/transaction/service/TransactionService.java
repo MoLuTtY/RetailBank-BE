@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.cts.transaction.model.AccountType;
+import com.cts.transaction.model.AuthenticationResponse;
 import com.cts.transaction.model.CreateTransactionRequest;
 import com.cts.transaction.model.GetTransactionsResponse;
 import com.cts.transaction.model.TransactionStatus;
@@ -19,5 +20,7 @@ public interface TransactionService {
 			BigDecimal amount);
 	List<GetTransactionsResponse> getTransactions(String token, Long customerId);
 	List<GetTransactionsResponse> getTransactionsByDateRange(String token, Long customerId, String dateFrom, String dateTo) throws ParseException, com.google.protobuf.TextFormat.ParseException;
-
+	AuthenticationResponse hasPermission(String token);
+	AuthenticationResponse hasCustomerPermission(String token);
+    AuthenticationResponse hasEmployeePermission(String token);
 }

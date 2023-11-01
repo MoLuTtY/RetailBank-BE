@@ -6,20 +6,21 @@ import java.util.Date;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.cts.account.exception.AccessDeniedException;
 import com.cts.account.exception.AccountNotFoundException;
 import com.cts.account.exception.MinimumBalanceException;
-
+import com.cts.account.feignClient.AuthFeignClient;
 import com.cts.account.feignClient.RuleFeignClient;
 import com.cts.account.feignClient.TransactionFeignClient;
 import com.cts.account.model.Account;
 import com.cts.account.model.AccountId;
 import com.cts.account.model.AccountType;
+import com.cts.account.model.AuthenticationResponse;
 import com.cts.account.model.CreateAccountRequest;
 import com.cts.account.model.CreateAccountResponse;
 import com.cts.account.model.CreateTransactionRequest;
 import com.cts.account.model.RuleStatus;
 import com.cts.account.repository.AccountRepository;
-
 
 import jakarta.transaction.Transactional;
 
@@ -31,14 +32,40 @@ public class AccountServiceImpl implements AccountService{
 	
 	private final TransactionFeignClient transactionFeignClient;
 	private final RuleFeignClient ruleFeignClient;
+	private final AuthFeignClient authFeignClient;
 	
 
     @Autowired
-    public AccountServiceImpl(TransactionFeignClient transactionFeignClient, RuleFeignClient ruleFeignClient) {
+    public AccountServiceImpl(TransactionFeignClient transactionFeignClient, RuleFeignClient ruleFeignClient, AuthFeignClient authFeignClient) {
         this.transactionFeignClient = transactionFeignClient;
         this.ruleFeignClient = ruleFeignClient;
+        this.authFeignClient = authFeignClient;
        
     }
+    
+    @Override
+	public AuthenticationResponse hasPermission(String token) {
+		return authFeignClient.getValidity(token);
+	}
+    
+    @Override
+	public AuthenticationResponse hasCustomerPermission(String token) {
+		AuthenticationResponse validity = authFeignClient.getValidity(token);
+		if (!authFeignClient.getRole(token, validity.getUserid()).equals("CUSTOMER"))
+			throw new AccessDeniedException("NOT ALLOWED");
+		else
+			return validity;
+	}
+    
+    @Override
+	public AuthenticationResponse hasEmployeePermission(String token) {
+		AuthenticationResponse validity = authFeignClient.getValidity(token);
+
+		if (!authFeignClient.getRole(token, validity.getUserid()).equals("EMPLOYEE"))
+			throw new AccessDeniedException("NOT ALLOWED");
+		else
+			return validity;
+	}
 	
 	private Long generateNextAccountNumber() {
 	    Account latestAccount = accountRepository.findTopByOrderByAccountIdDesc();

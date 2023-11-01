@@ -20,4 +20,10 @@ public class GlobalExceptionHandler {
 		return res;
 	}
 	
+	@ExceptionHandler(AccessDeniedException.class)
+	public ResponseEntity<String> accessDenied(AccessDeniedException ex) {
+		ResponseEntity<String> res = new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+		return res;
+	}
+	
 }

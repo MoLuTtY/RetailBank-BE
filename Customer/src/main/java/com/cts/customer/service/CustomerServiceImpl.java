@@ -43,7 +43,6 @@ public class CustomerServiceImpl implements CustomerService{
 		this.authFeignClient = authFeignClient;
     }
     
-    
     @Override
 	public AuthenticationResponse hasPermission(String token) {
 		return authFeignClient.getValidity(token);
@@ -61,6 +60,7 @@ public class CustomerServiceImpl implements CustomerService{
     @Override
 	public AuthenticationResponse hasEmployeePermission(String token) {
 		AuthenticationResponse validity = authFeignClient.getValidity(token);
+
 		if (!authFeignClient.getRole(token, validity.getUserid()).equals("EMPLOYEE"))
 			throw new AccessDeniedException("NOT ALLOWED");
 		else
@@ -81,6 +81,7 @@ public class CustomerServiceImpl implements CustomerService{
         return generatedCustomerId;
     }
 
+	@Override
 	public CreateCustomerResponse createCustomer(String token,Customer customer) {
 		if (customer.getCustomerName() == null || customer.getPassword() == null ||
 	            customer.getDateOfBirth() == null || customer.getPan() == null ||
@@ -103,11 +104,10 @@ public class CustomerServiceImpl implements CustomerService{
         } catch (Exception e) {
            
             return new CreateCustomerResponse(null, "Error creating customer");
-        }
-       
-        
+        }        
     }
 
+	@Override
 	public List<CustomerDetailsResponse> getAllCustomersWithSavingsAccount(String token) {
 		
         List<CustomerDetailsResponse> result = new ArrayList<>();
@@ -133,8 +133,7 @@ public class CustomerServiceImpl implements CustomerService{
             }
         }
 
-        return result;
-		
+        return result;		
     }
 
 	@Override
@@ -211,7 +210,6 @@ public class CustomerServiceImpl implements CustomerService{
 	    
 	    result.add(currentResponse);
 	    
-	    return result;
-	    
+	    return result;	    
 	}		
 }

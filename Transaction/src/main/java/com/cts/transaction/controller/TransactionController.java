@@ -33,6 +33,7 @@ public class TransactionController {
 	
 	@PostMapping("/deposit")
 	public ResponseEntity<TransactionStatus> deposit(@RequestHeader("Authorization") String token, @RequestBody CreateTransactionRequest transaction) {
+		transactionService.hasEmployeePermission(token);
 		TransactionStatus status = transactionService.deposit(token, transaction);
 		
 		if (status.getTransactionId() != null) {
@@ -44,6 +45,7 @@ public class TransactionController {
 	
 	@PostMapping("/withdraw")
 	public ResponseEntity<TransactionStatus> withdraw(@RequestHeader("Authorization") String token, @RequestBody CreateTransactionRequest transaction) {
+		transactionService.hasCustomerPermission(token);
 		TransactionStatus status = transactionService.withdraw(token,transaction);
 		
 		if (status.getTransactionId() != null) {
@@ -60,6 +62,7 @@ public class TransactionController {
 	
 	@PostMapping("/transfer/{source_account_no}/{source_account_type}/{target_account_no}/{amount}")
 	public ResponseEntity<TransactionStatus> transfer(@RequestHeader("Authorization") String token, @PathVariable Long source_account_no, @PathVariable AccountType source_account_type, @PathVariable Long target_account_no, @PathVariable BigDecimal amount) {
+		transactionService.hasCustomerPermission(token);
 		TransactionStatus status = transactionService.trasfer(token,source_account_no,source_account_type,target_account_no,amount);
 		if (status.getTransactionId() != null) {
             return ResponseEntity.ok(status);

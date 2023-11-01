@@ -5,8 +5,10 @@ import java.math.BigDecimal;
 
 import com.cts.account.model.Account;
 import com.cts.account.model.AccountType;
+import com.cts.account.model.AuthenticationResponse;
 import com.cts.account.model.CreateAccountRequest;
 import com.cts.account.model.CreateAccountResponse;
+
 
 public interface AccountService {
 	
@@ -21,5 +23,8 @@ public interface AccountService {
 	public Account findCurrentAccounts(String token, Long customerId);
 	public void withdraw( String token, Long accountNo, AccountType accountType, BigDecimal amount);
 	public Long getAccount(String token, Long accountNo, AccountType accountType);
+	AuthenticationResponse hasPermission(String token);
+	AuthenticationResponse hasCustomerPermission(String token);
+    AuthenticationResponse hasEmployeePermission(String token);
 	
 }

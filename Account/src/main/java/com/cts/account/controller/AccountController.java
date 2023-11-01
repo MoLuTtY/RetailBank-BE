@@ -34,6 +34,7 @@ public class AccountController {
 	
 	@PostMapping("/create-account")
 	public ResponseEntity<CreateAccountResponse> createAccount(@RequestHeader("Authorization") String token,@RequestBody CreateAccountRequest createAccountRequest) {
+		accountService.hasEmployeePermission(token);
 		CreateAccountResponse response = accountService.createAccount(token,createAccountRequest);
         if (response.getAccountNo() != null) {
             return ResponseEntity.ok(response);
@@ -75,6 +76,7 @@ public class AccountController {
 	
 	@DeleteMapping("/delete-account/{accountNo}")
     public void deleteAllAccountsByAccountNo(@RequestHeader("Authorization") String token, @PathVariable Long accountNo) {
+		accountService.hasEmployeePermission(token);
         accountService.deleteAllAccountsByAccountNo(token, accountNo);
     }
 	
@@ -85,6 +87,7 @@ public class AccountController {
 	
 	@PostMapping("/deposit/{accountNo}/{accountType}/{amount}")
 	public String deposit(@RequestHeader("Authorization") String token, @PathVariable Long accountNo,@PathVariable AccountType accountType, @PathVariable BigDecimal amount) {
+		accountService.hasEmployeePermission(token);
 		accountService.deposit(token, accountNo, accountType, amount);
 		return "Status : Deposit Successful";
 	}
@@ -101,7 +104,7 @@ public class AccountController {
 	
 	@PostMapping("/withdraw/{accountNo}/{accountType}/{amount}")
 	public String withdraw(@RequestHeader("Authorization") String token, @PathVariable Long accountNo,@PathVariable AccountType accountType, @PathVariable BigDecimal amount) {
-		
+		accountService.hasCustomerPermission(token);
 		accountService.withdraw(token,accountNo, accountType, amount);
 		return "Status : Withdrawal Successful";
 	}
@@ -110,9 +113,5 @@ public class AccountController {
 	public Long getAccount(@RequestHeader("Authorization") String token,@PathVariable Long accountNo, @PathVariable AccountType accountType) {
 		return accountService.getAccount(token,accountNo,accountType);
 	}
-	
-	
-	
-	
-	
+		
 }

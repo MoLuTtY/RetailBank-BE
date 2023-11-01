@@ -32,6 +32,7 @@ public class CustomerController {
      
     @PostMapping("/create-customer")
     public ResponseEntity<CreateCustomerResponse> createCustomer(@RequestHeader("Authorization") String token,@RequestBody Customer customer) {
+    	customerService.hasEmployeePermission(token);
         CreateCustomerResponse response = customerService.createCustomer(token,customer);
         if (response.getCustomerId() != null) {
             return ResponseEntity.ok(response);
@@ -42,13 +43,14 @@ public class CustomerController {
     
     @GetMapping("/allCustomers-with-savings-account")
     public ResponseEntity<List<CustomerDetailsResponse>> allCustomersWithSavingsAccount(@RequestHeader("Authorization") String token) {
+    	customerService.hasEmployeePermission(token);
         List<CustomerDetailsResponse> result = customerService.getAllCustomersWithSavingsAccount(token);
         return ResponseEntity.ok(result);
     }
     
     @GetMapping("/search-customer/{accountNo}/{accountType}")
     public ResponseEntity<CustomerDetailsResponse> searchCustomer(@RequestHeader("Authorization") String token, @PathVariable Long accountNo, @PathVariable AccountType accountType) {
-
+    	    customerService.hasEmployeePermission(token);
             CustomerDetailsResponse response = customerService.searchCustomer(token, accountNo, accountType);
             return ResponseEntity.ok(response);
         
@@ -56,6 +58,7 @@ public class CustomerController {
     
     @DeleteMapping("/delete-customer/{customerId}")
 	public String deleteCustomer(@RequestHeader("Authorization") String token,@PathVariable Long customerId) {
+    	customerService.hasEmployeePermission(token);
 		return customerService.deleteCustomer(token, customerId);
 	}
     
