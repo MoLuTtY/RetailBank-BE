@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * The AuthenticationMsApplication class to start the application
  *
  */
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.cognizant.authenticationservice")
 public class AuthenticationMsApplication {
 
 	/**

@@ -26,5 +26,6 @@ public interface AccountService {
 	AuthenticationResponse hasPermission(String token);
 	AuthenticationResponse hasCustomerPermission(String token);
     AuthenticationResponse hasEmployeePermission(String token);
+	public boolean doesAccountExist(Long accountNo, AccountType accountType);
 	
 }

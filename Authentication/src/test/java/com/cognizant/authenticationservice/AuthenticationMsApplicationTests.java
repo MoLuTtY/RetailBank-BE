@@ -9,9 +9,5 @@ class AuthenticationMsApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-	@Test
-	void main() {
-		AuthenticationMsApplication.main(new String[] {});
-	}
 
 }

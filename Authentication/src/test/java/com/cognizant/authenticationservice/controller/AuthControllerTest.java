@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.cognizant.authenticationservice.service.CustomerDetailsService;
 import com.cognizant.authenticationservice.service.LoginService;
 import com.cognizant.authenticationservice.service.Validationservice;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(AuthController.class)
 public class AuthControllerTest {
@@ -23,5 +24,13 @@ public class AuthControllerTest {
 
 	@MockBean
 	private CustomerDetailsService customerService;
+	
+    private String asJsonString(final Object obj) {
+        try {
+            return new ObjectMapper().writeValueAsString(obj);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

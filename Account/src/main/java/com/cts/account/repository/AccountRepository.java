@@ -32,5 +32,9 @@ public interface AccountRepository extends JpaRepository<Account, Long>{
 
     @Query("SELECT a FROM Account a WHERE a.customerId = :customerId AND a.accountId.accountType = 'CURRENT'")
 	Account findCurrentAccountByCustomerId(@Param("customerId")Long customerId);
+    
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Account a WHERE a.accountId.accountNo = :accountNo AND a.accountId.accountType = :accountType")
+    boolean doesAccountExist(@Param("accountNo")Long accountNo, @Param("accountType")AccountType accountType);
+
 
 }

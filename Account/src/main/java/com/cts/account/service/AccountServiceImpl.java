@@ -226,6 +226,12 @@ public class AccountServiceImpl implements AccountService{
 		return account.getId();
 	}
 
+	@Override
+	public boolean doesAccountExist(Long accountNo, AccountType accountType) {
+		
+		return accountRepository.doesAccountExist(accountNo, accountType);
+	}
+
 	
 
 

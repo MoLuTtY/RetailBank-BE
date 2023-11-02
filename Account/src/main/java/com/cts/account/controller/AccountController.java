@@ -113,5 +113,12 @@ public class AccountController {
 	public Long getAccount(@RequestHeader("Authorization") String token,@PathVariable Long accountNo, @PathVariable AccountType accountType) {
 		return accountService.getAccount(token,accountNo,accountType);
 	}
+	
+	@GetMapping("/account-exist/{accountNo}/{accountType}")
+	public ResponseEntity<Boolean> doesAccountExist(@PathVariable Long accountNo,@PathVariable AccountType accountType) {	
+        boolean accountExists = accountService.doesAccountExist(accountNo, accountType);
+        HttpStatus status = accountExists ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+        return new ResponseEntity<>(accountExists, status);
+	}
 		
 }

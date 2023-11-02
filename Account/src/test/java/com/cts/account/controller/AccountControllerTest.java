@@ -26,6 +26,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.cts.account.model.Account;
 import com.cts.account.model.AccountId;
@@ -228,6 +229,22 @@ public class AccountControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().string(expectedAccountId.toString()));
+    }
+    
+    @Test
+    public void testDoesAccountExist() throws Exception {
+       
+        Long accountNo = 12345L;
+        AccountType accountType = AccountType.SAVINGS;
+
+        when(accountService.doesAccountExist(accountNo, accountType)).thenReturn(true);
+
+        mockMvc.perform(
+            MockMvcRequestBuilders
+                .get("/api/accounts/account-exist/{accountNo}/{accountType}", accountNo, accountType)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("true")); 
     }
 
     @SuppressWarnings("unused")
